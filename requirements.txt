@@ -6,3 +6,4 @@ scikit-learn
 numpy
 flask_cors
 gunicorn
+python-dotenv
