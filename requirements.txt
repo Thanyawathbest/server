@@ -1,0 +1,8 @@
+Flask
+flask_pymongo
+Pillow
+img2vec_pytorch
+scikit-learn
+numpy
+flask_cors
+gunicorn

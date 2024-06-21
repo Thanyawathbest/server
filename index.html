@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Search</title>
+    <style>
+        .image-container {
+            margin-bottom: 20px;
+        }
+        .image-container img {
+            max-width: 200px; /* หรือขนาดที่คุณต้องการ */
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Image Search</h1>
+    <form id="upload-form" enctype="multipart/form-data">
+        <label for="image">Upload Image:</label>
+        <input type="file" id="image" name="image" required>
+        <label for="topic">Topic:</label>
+        <input type="text" id="topic" name="topic" required>
+        <label for="description">Description:</label>
+        <textarea type="text" id="description" name="description" required>
+        </textarea>
+        <button type="submit">Upload</button>
+    </form>
+
+    <h2>Search for Similar Images</h2>
+    <form id="search-form" enctype="multipart/form-data">
+        <label for="search-image">Search Image:</label>
+        <input type="file" id="search-image" name="image" required>
+        <button type="submit">Search</button>
+    </form>
+
+    <h3>Search Results:</h3>
+    <div id="results"></div>
+
+    <script>
+        document.getElementById('upload-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let formData = new FormData(this);
+            fetch('/upload_image', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while uploading the image.');
+            });
+        });
+
+        document.getElementById('search-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            let formData = new FormData(this);
+            fetch('/search_image', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                let results = document.getElementById('results');
+                results.innerHTML = '';
+                if (data.results && data.results.length > 0) {
+                    data.results.forEach(item => {
+                        let div = document.createElement('div');
+                        div.classList.add('image-container');
+                        let img = document.createElement('img');
+                        img.src = `data:image/jpeg;base64,${item.image}`;
+                        img.alt = `Filename: ${item.filename}, Description: ${item.description}`;
+                        let filename = document.createElement('p');
+                        filename.textContent = `Filename: ${item.filename}`;
+                        let topic = document.createElement('p');
+                        topic.textContent = `Topic: ${item.topic}`;
+                        let description = document.createElement('p');
+                        description.textContent = `Description: ${item.description}`;
+                        div.appendChild(img);
+                        div.appendChild(filename);
+                        div.appendChild(topic);
+                        div.appendChild(description);
+                        results.appendChild(div);
+                    });
+                } else {
+                    results.innerHTML = 'No results found';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while searching for images.');
+            });
+        });
+    </script>
+</body>
+</html>
