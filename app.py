@@ -4,7 +4,10 @@ from bson.objectid import ObjectId
 import bson.binary
 import numpy as np
 from PIL import Image
-from img2vec_pytorch import Img2Vec
+import torch
+from torchvision.models import efficientnet_b5, EfficientNet_B5_Weights
+import torch.nn as nn
+import torchvision.transforms as transforms
 from sklearn.metrics.pairwise import cosine_similarity
 import io
 import logging
@@ -12,6 +15,7 @@ import base64
 from flask_cors import CORS
 import os
 from dotenv import load_dotenv
+from img2vec_pytorch import Img2Vec
 
 load_dotenv()  # โหลด Environment Variables จากไฟล์ .env
 
@@ -26,8 +30,12 @@ collection = mongo.db.mycollection
 collectionform = mongo.db.evaluate_satisfaction
 image_features_collection = mongo.db.image_features
 
-# โหลดโมเดล densenet จาก img2vec
-img2vec = Img2Vec(model='efficientnet_b5')
+# โหลดโมเดล EfficientNet-B5 และใช้ Img2Vec
+model_name = "efficientnet_b5"
+layer = 'default'
+cuda = torch.cuda.is_available()
+
+img2vec = Img2Vec(cuda=cuda, model=model_name, layer=layer)
 
 # ตั้งค่าการบันทึก log
 logging.basicConfig(level=logging.INFO)
